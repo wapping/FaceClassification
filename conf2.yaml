@@ -23,4 +23,4 @@ dataset:
 
 logdir: ./log/mini
 
-mode: train
+mode: val
