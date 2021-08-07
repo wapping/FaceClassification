@@ -14,7 +14,7 @@ model_state_dict: models/simple/SimpleCNN-156-0.9601197476745429.params  # Where
 opt_state_dict: models/simple/SimpleCNN-156.opt    # Where to restore the optimizer parameters
 
 dataset:
-  imdb_dir: /data1/lihp/data/imdb_crop/ # /Users/lihp/Downloads/imdb_crop/
+  imdb_dir: /data1/lihp/data/imdb_crop/
   grayscale: True
   do_rand_crop: True
   translation_factor: .2
