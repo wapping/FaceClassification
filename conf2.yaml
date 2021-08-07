@@ -1,0 +1,26 @@
+model_name: MiniXception
+
+batch_size: 32
+epochs: 1000
+validation_split: .2
+
+
+seed: 666
+
+model_dir: ./models/mini  # Where to save the model parameters
+
+restore: False
+model_state_dict: ./models/mini/MiniXception-93-0.9605474179152765.params  # Where to restore the model parameters
+opt_state_dict: ./models/mini/MiniXception-93.opt    # Where to restore the optimizer parameters
+
+dataset:
+  imdb_dir: /data1/lihp/data/imdb_crop/ # /Users/lihp/Downloads/imdb_crop/
+  grayscale: True
+  do_rand_crop: True
+  translation_factor: .2
+  vertical_flip_probability: 0.
+  read_img_at_once: True  # Set to `True` if the memory of your device allows. It will speed up the training.
+
+logdir: ./log/mini
+
+mode: train

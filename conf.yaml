@@ -1,0 +1,26 @@
+model_name: SimpleCNN
+
+batch_size: 32
+epochs: 1000
+validation_split: .2
+
+
+seed: 888
+
+model_dir: ./models/simple  # Where to save the model parameters
+
+restore: False
+model_state_dict: models/simple/SimpleCNN-156-0.9601197476745429.params  # Where to restore the model parameters
+opt_state_dict: models/simple/SimpleCNN-156.opt    # Where to restore the optimizer parameters
+
+dataset:
+  imdb_dir: /data1/lihp/data/imdb_crop/ # /Users/lihp/Downloads/imdb_crop/
+  grayscale: True
+  do_rand_crop: True
+  translation_factor: .2
+  vertical_flip_probability: 0.
+  read_img_at_once: True  # Set to `True` if the memory of your device allows. It will speed up the training.
+
+logdir: ./log/simple/
+
+mode: train
