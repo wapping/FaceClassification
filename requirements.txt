@@ -1,5 +1,6 @@
 scipy==1.2.1
 paddlepaddle==2.1.2
-numpy==1.16.4
-yaml==0.2.5
+numpy==1.21.1
 opencv-python==3.4.10.37
+pyyaml~=5.4.1
+visualdl~=2.2.0
