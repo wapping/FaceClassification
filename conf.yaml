@@ -1,4 +1,4 @@
-model_name: SimpleCNN
+model_name: SimpleCNN    # Don't need to modify this item, because this configuration file is just for this model.
 
 batch_size: 32
 epochs: 1000
@@ -9,18 +9,18 @@ seed: 888
 
 model_dir: ./models/simple  # Where to save the model parameters
 
-restore: False
+restore: False  # If `True`, restore parameters from `model_state_dict` and `opt_state_dict` for training
 model_state_dict: models/simple/SimpleCNN-156-0.9601197476745429.params  # Where to restore the model parameters
 opt_state_dict: models/simple/SimpleCNN-156.opt    # Where to restore the optimizer parameters
 
 dataset:
-  imdb_dir: /data1/lihp/data/imdb_crop/
+  imdb_dir: /data1/lihp/data/imdb_crop/   # Where is the `imdb` dataset
   grayscale: True
   do_rand_crop: True
   translation_factor: .2
   vertical_flip_probability: 0.
   read_img_at_once: True  # Set to `True` if the memory of your device allows. It will speed up the training.
 
-logdir: ./log/simple/
+logdir: ./log/simple/   # Where to output the logs
 
-mode: val
+mode: val   # `train` or `val`
