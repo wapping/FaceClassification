@@ -35,9 +35,11 @@ def train():
                             translation_factor=data_args['translation_factor'],
                             vertical_flip_probability=data_args['vertical_flip_probability'],
                             read_img_at_once=data_args['read_img_at_once'],
+                            img_size=data_args['img_size'],
                             )
     val_set = FaceDataset(val_set, img_path_prefix=data_args['imdb_dir'], grayscale=data_args['grayscale'],
                           read_img_at_once=data_args['read_img_at_once'],
+                          img_size=data_args['img_size'],
                           )
     logging.info(
         f"The numbers of samples of training and validating sets are {train_set.__len__()} and {val_set.__len__()}.")
@@ -52,9 +54,9 @@ def train():
     if args['model_name'] == "MiniXception":
         model = MiniXception()
     else:
-        model = SimpleCNN()
+        model = SimpleCNN(in_channels=args['in_channels'])
 
-    scheduler = paddle.optimizer.lr.ReduceOnPlateau(learning_rate=0.001, factor=0.1, patience=50, verbose=True)
+    scheduler = paddle.optimizer.lr.ReduceOnPlateau(learning_rate=0.001, factor=0.5, patience=50, verbose=True, epsilon=1e-6)
     optimizer = paddle.optimizer.Adam(learning_rate=scheduler, parameters=model.parameters(),
                                       # weight_decay=0.001,
                                       )
@@ -76,7 +78,7 @@ def train():
     val_logger = LogWriter(logdir=os.path.join(args['logdir'], 'val'))
 
     # Starting training
-    max_val_acc = 0.945
+    max_val_acc = 0.95
     for epoch in range(epoch, args['epochs'] + 1):
         logging.info("=" * 50 + f"Epoch {epoch}" + "=" * 50)
 
@@ -110,7 +112,7 @@ def train():
                 # train_logger.add_scalar('lr', optimizer.get_lr(), (epoch - 1) * len(train_loader) + step)
 
         loss, acc = sum_loss / n_samples, sum_acc / n_samples
-        scheduler.step(loss, epoch)
+
         train_logger.add_scalar('loss', loss, epoch)
         train_logger.add_scalar('acc', acc, epoch)
         train_logger.add_scalar('lr', optimizer.get_lr(), epoch)
@@ -140,13 +142,15 @@ def train():
         val_logger.add_scalar('loss', loss, epoch)
         val_logger.add_scalar('acc', acc, epoch)
 
+        scheduler.step(loss, epoch)
+
         if acc > max_val_acc:
             logging.info(f"Epoch {epoch}, Output model with val acc {acc} to {args['model_dir']}")
             paddle.save(model.state_dict(),
                         os.path.join(args['model_dir'], f"{args['model_name']}-{epoch}-{acc}.params"))
             paddle.save(optimizer.state_dict(), os.path.join(args['model_dir'], f"{args['model_name']}-{epoch}.opt"))
             max_val_acc = acc
-            if acc >= 0.97:
+            if acc >= 0.96:
                 logging.info("Finished training.")
                 break
 
@@ -165,7 +169,9 @@ def validate():
 
     _, val_set = split_imdb_data(data, args['validation_split'])
 
-    val_set = FaceDataset(val_set, img_path_prefix=data_args['imdb_dir'], grayscale=data_args['grayscale'])
+    val_set = FaceDataset(val_set, img_path_prefix=data_args['imdb_dir'], grayscale=data_args['grayscale'],
+                          img_size=data_args['img_size']
+                          )
 
     logging.info(
         f"The number of validation samples is {val_set.__len__()}.")
@@ -175,7 +181,8 @@ def validate():
     if args['model_name'] == "MiniXception":
         model = MiniXception()
     else:
-        model = SimpleCNN()
+        model = SimpleCNN(in_channels=args['in_channels'])
+
     model_state_dict = paddle.load(args['model_state_dict'])
     model.set_state_dict(model_state_dict)
 

@@ -104,12 +104,12 @@ class SimpleCNN(nn.Layer):
         self.in_channels = in_channels
 
         self.conv1 = nn.Sequential(
-            nn.Conv2D(self.in_channels, 16, 7, 1, padding='same'),
+            nn.Conv2D(self.in_channels, 16, 7, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(16),
         )
 
         self.conv2 = nn.Sequential(
-            nn.Conv2D(16, 16, 7, 1, padding='same'),
+            nn.Conv2D(16, 16, 7, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(16),
             nn.ReLU(),
             nn.AvgPool2D(kernel_size=(2, 2), padding='same'),
@@ -117,12 +117,12 @@ class SimpleCNN(nn.Layer):
         )
 
         self.conv3 = nn.Sequential(
-            nn.Conv2D(16, 32, 5, 1, padding='same'),
+            nn.Conv2D(16, 32, 5, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(32),
         )
 
         self.conv4 = nn.Sequential(
-            nn.Conv2D(32, 32, 5, 1, padding='same'),
+            nn.Conv2D(32, 32, 5, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(32),
             nn.ReLU(),
             nn.AvgPool2D(kernel_size=(2, 2), padding='same'),
@@ -130,12 +130,12 @@ class SimpleCNN(nn.Layer):
         )
 
         self.conv5 = nn.Sequential(
-            nn.Conv2D(32, 64, 3, 1, padding='same'),
+            nn.Conv2D(32, 64, 3, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(64),
         )
 
         self.conv6 = nn.Sequential(
-            nn.Conv2D(64, 64, 3, 1, padding='same'),
+            nn.Conv2D(64, 64, 3, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(64),
             nn.ReLU(),
             nn.AvgPool2D(kernel_size=(2, 2), padding='same'),
@@ -143,12 +143,12 @@ class SimpleCNN(nn.Layer):
         )
 
         self.conv7 = nn.Sequential(
-            nn.Conv2D(64, 128, 3, 1, padding='same'),
+            nn.Conv2D(64, 128, 3, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(128),
         )
 
         self.conv8 = nn.Sequential(
-            nn.Conv2D(128, 128, 3, 1, padding='same'),
+            nn.Conv2D(128, 128, 3, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(128),
             nn.ReLU(),
             nn.AvgPool2D(kernel_size=(2, 2), padding='same'),
@@ -156,7 +156,7 @@ class SimpleCNN(nn.Layer):
         )
 
         self.conv9 = nn.Sequential(
-            nn.Conv2D(128, 256, 3, 1, padding='same'),
+            nn.Conv2D(128, 256, 3, 1, padding='same', bias_attr=False),
             nn.BatchNorm2D(256),
         )
 

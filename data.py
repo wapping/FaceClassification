@@ -38,7 +38,10 @@ class FaceDataset(Dataset):
         super(FaceDataset, self).__init__()
         self.data = data
         self.img_path_prefix = img_path_prefix
-        self.img_size = img_size
+        if isinstance(img_size, int):
+            self.img_size = (img_size, img_size)
+        else:
+            self.img_size = img_size
         self.do_transform = do_transform
         self.saturation_var = saturation_var
         self.brightness_var = brightness_var
@@ -61,10 +64,17 @@ class FaceDataset(Dataset):
         if contrast_var:
             self.contrast_var = contrast_var
             self.color_jitter.append(self.contrast)
-        self.n_samples = len(self.data)
-        self.images = []
+
         self.read_img_at_once = read_img_at_once
-        if read_img_at_once:
+
+        self.images = []
+        if not grayscale:
+            self.filter_images_3_channels()
+
+        self.n_samples = len(self.data)
+
+        if read_img_at_once and len(self.images) == 0:
+            logging.info(f"read_img_at_once: {read_img_at_once}")
             self.read_resize_images()
 
     def __getitem__(self, index):
@@ -158,6 +168,30 @@ class FaceDataset(Dataset):
             image_array = imresize(image_array, self.img_size)
 
             self.images.append(image_array)
+
+    def filter_images_3_channels(self):
+        data = []
+        images = []
+        for item in self.data:
+            img_path, label = item[0], item[1]
+
+            if self.img_path_prefix:
+                img_path = os.path.join(self.img_path_prefix, img_path)
+
+            image_array = imread(img_path)
+
+            is_gray = True if len(image_array.shape) == 2 else False
+
+            if is_gray:
+                continue
+
+            data.append(item)
+            if self.read_img_at_once:
+                image_array = imresize(image_array, self.img_size)
+                images.append(image_array)
+
+        self.data = data
+        self.images = images
 
     def __len__(self):
         return self.n_samples
