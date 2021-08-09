@@ -1,5 +1,5 @@
 # 简介
-通过PaddlePaddle框架复现了论文 [`Real-time Convolutional Neural Networks for Emotion and Gender Classification`](https://arxiv.org/pdf/1710.07557v1.pdf) 中提出的两个模型，分别是`SimpleCNN`和`MiniXception`。利用 `imdb_crop`数据集训练模型，进行人脸性别分类，准确率均达到96%。详细代码和模型已经发到比赛邮件里。
+通过PaddlePaddle框架复现了论文 [`Real-time Convolutional Neural Networks for Emotion and Gender Classification`](https://arxiv.org/pdf/1710.07557v1.pdf) 中提出的两个模型，分别是`SimpleCNN`和`MiniXception`。利用 `imdb_crop`数据集训练模型，进行人脸性别分类，准确率均达到96%。
 | 模型 | 准确率 | 输入尺寸 |
 |  :---  | ----  | ----  |
 | SimpleCNN | 96.00% | (48, 48, 3) |
