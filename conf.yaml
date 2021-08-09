@@ -10,9 +10,9 @@ seed: 888
 
 model_dir: ./models/simple  # Where to save the model parameters
 
-restore: True  # If `True`, restore parameters from `model_state_dict` and `opt_state_dict` for training
-model_state_dict: models/simple/SimpleCNN-443-0.9600263562486273.params  # Where to restore the model parameters
-opt_state_dict: models/simple/SimpleCNN-443.opt    # Where to restore the optimizer parameters
+restore: False  # If `True`, restore parameters from `model_state_dict` and `opt_state_dict` for training
+model_state_dict: models/simple/SimpleCNN-273-0.9600812650999341.params  # Where to restore the model parameters
+opt_state_dict: models/simple/SimpleCNN-273.opt    # Where to restore the optimizer parameters
 
 dataset:
   imdb_dir: /data1/lihp/data/imdb_crop/   # Where is the `imdb` dataset
