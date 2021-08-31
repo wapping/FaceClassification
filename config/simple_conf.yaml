@@ -1,5 +1,6 @@
 model_name: SimpleCNN    # Don't need to modify this item, because this configuration file is just for this model.
 in_channels: 3
+n_classes: 2
 
 batch_size: 32
 epochs: 1000

@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
-"""
-Description :
-Authors     : Wapping
-CreateDate  : 2021/8/6
-"""
+# Copyright (c) 2021 PaddlePaddle Authors. All Rights Reserved.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import cv2
 import logging
@@ -13,10 +22,9 @@ import scipy.ndimage as ndi
 from scipy.io import loadmat
 from scipy.misc import imread, imresize
 from random import shuffle
-from utils import preprocess_input
 
 
-logging.basicConfig(format="%(levelname)s - %(message)s", level=logging.INFO)
+logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
 
 class FaceDataset(Dataset):
@@ -342,3 +350,12 @@ def split_imdb_data(data, validation_split=.2, do_shuffle=False):
     train_set = data[:num_train]
     val_set = data[num_train:]
     return train_set, val_set
+
+
+def preprocess_input(x, v2=True):
+    x = x.astype('float32')
+    x = x / 255.0
+    if v2:
+        x = x - 0.5
+        x = x * 2.0
+    return x

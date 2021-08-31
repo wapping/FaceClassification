@@ -32,7 +32,7 @@ python train_gender_classfifier.py path_to_conf
 ```
 比如
 ```shell
-python train_gender_classfifier.py ./conf.yaml
+python train_gender_classfifier.py ./simple_conf.yaml
 ```
 
 `path_to_conf` 是可选的，默认是 `./conf.yaml`，即训练`SimpleCNN`。
@@ -69,15 +69,15 @@ http://127.0.0.1:8040/
 
 ## SimpleCNN
 
-![avatar](./image4readme/simple_loss.png)
+![avatar](images/simple_loss.png)
 
-![avatar](./image4readme/simple_acc.png)
+![avatar](images/simple_acc.png)
 
 ## MiniXception
 
-![avatar](./image4readme/mini_loss.png)
+![avatar](images/mini_loss.png)
 
-![avatar](./image4readme/mini_acc.png)
+![avatar](images/mini_acc.png)
 
 
 
