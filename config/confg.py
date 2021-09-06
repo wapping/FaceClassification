@@ -12,12 +12,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""
+Description: Some function for configuration of the models.
+"""
 import yaml
 from argparse import Namespace
 
 
 def parse_args(parser):
+    """Parse the arguments.
+    Args:
+        parser: An instance of argparse.ArgumentParser.
+    Returns:
+        args: An instance of argparse.Namespace.
+    """
     args = parser.parse_args()
     if not args.conf_path:
         raise ValueError(f"--conf_path can't be None.")
@@ -31,6 +39,12 @@ def parse_args(parser):
 
 
 def dict2namespace(dic):
+    """Convert a `dict` to an `argparse.Namespace`.
+    Args:
+        dic: A `dict`.
+    Returns:
+        args: An instance of argparse.Namespace.
+    """
     for k, v in dic.items():
         if isinstance(v, dict):
             v = dict2namespace(v)

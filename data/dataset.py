@@ -12,7 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""
+Description: Some functions or classes of dataset.
+"""
 import os
 import cv2
 import logging
@@ -28,6 +30,7 @@ logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=lo
 
 
 class FaceDataset(Dataset):
+    """Dataset class that inherits from paddle.io.Dataset."""
     def __init__(self, data, img_path_prefix="", img_size=(64, 64),
                  do_transform=False,
                  saturation_var=0.5,
@@ -42,7 +45,25 @@ class FaceDataset(Dataset):
                  translation_factor=.3,
                  data_format='NCHW',
                  read_img_at_once=False):
-
+        """
+        Args:
+            data: The data set to be split, e.g. [(abc.jpg, 0), ...].
+            img_path_prefix: The prefix of the path to images in the data set.
+            img_size: Images will be resized to this size.
+            do_transform: If `True`, augment the images.
+            saturation_var: See self.saturation() for detail.
+            brightness_var: See self.brightness() for detail.
+            contrast_var: See self.contrast() for detail.
+            lighting_std: See self.lighting() for detail.
+            horizontal_flip_probability: See self.horizontal_flip() for detail.
+            vertical_flip_probability: See self.vertical_flip() for detail.
+            do_random_crop: See self._do_random_crop() for detail.
+            grayscale: If `True`, process the image to be grayscale ones.
+            zoom_range: See self.brightness() for detail.
+            translation_factor: See self.brightness() for detail.
+            data_format: 'NCHW' or `NHWC`
+            read_img_at_once: If `True`, read all the images at once.
+        """
         super(FaceDataset, self).__init__()
         self.data = data
         self.img_path_prefix = img_path_prefix
@@ -86,12 +107,14 @@ class FaceDataset(Dataset):
             self.read_resize_images()
 
     def __getitem__(self, index):
+        """Get one item (image, label) by an index."""
         if self.read_img_at_once:
             return self._getitem_v2(index)
         else:
             return self._getitem(index)
 
     def _getitem(self, index):
+        """Get one item (image, label) by an index."""
         item = self.data[index]
         img_path, label = item[0], item[1]
         if self.img_path_prefix:
@@ -129,6 +152,7 @@ class FaceDataset(Dataset):
         return image_array, label
 
     def _getitem_v2(self, index):
+        """Get one item (image, label) by an index."""
         item = self.data[index]
         img_path, label = item[0], item[1]
         if self.img_path_prefix:
@@ -164,6 +188,7 @@ class FaceDataset(Dataset):
         return image_array, label
 
     def read_resize_images(self):
+        """Read and resize the images of self.data"""
         self.images = []
         for item in self.data:
             img_path, label = item[0], item[1]
@@ -178,6 +203,7 @@ class FaceDataset(Dataset):
             self.images.append(image_array)
 
     def filter_images_3_channels(self):
+        """Filter images of self.data with 3 channels."""
         data = []
         images = []
         for item in self.data:
@@ -205,8 +231,10 @@ class FaceDataset(Dataset):
         return self.n_samples
 
     def _do_random_crop(self, image_array):
-        """IMPORTANT: random crop only works for classification since the
-        current implementation does no transform bounding boxes"""
+        """Crop the images randomly.
+        IMPORTANT: random crop only works for classification since the
+        current implementation does no transform bounding boxes
+        """
         height = image_array.shape[0]
         width = image_array.shape[1]
         x_offset = np.random.uniform(0, self.translation_factor * width)
@@ -227,8 +255,10 @@ class FaceDataset(Dataset):
         return image_array
 
     def do_random_rotation(self, image_array):
-        """IMPORTANT: random rotation only works for classification since the
-        current implementation does no transform bounding boxes"""
+        """Rotate the input images randomly.
+        IMPORTANT: random rotation only works for classification since the
+        current implementation does no transform bounding boxes
+        """
         height = image_array.shape[0]
         width = image_array.shape[1]
         x_offset = np.random.uniform(0, self.translation_factor * width)
@@ -249,9 +279,11 @@ class FaceDataset(Dataset):
         return image_array
 
     def _gray_scale(self, image_array):
+        """Convert the images to grey scale ones."""
         return image_array.dot([0.299, 0.587, 0.114])
 
     def saturation(self, image_array):
+        """Change the saturations of the images."""
         gray_scale = self._gray_scale(image_array)
         alpha = 2.0 * np.random.random() * self.brightness_var
         alpha = alpha + 1 - self.saturation_var
@@ -260,12 +292,14 @@ class FaceDataset(Dataset):
         return np.clip(image_array, 0, 255)
 
     def brightness(self, image_array):
+        """Change the brightnesses of the images."""
         alpha = 2 * np.random.random() * self.brightness_var
         alpha = alpha + 1 - self.saturation_var
         image_array = alpha * image_array
         return np.clip(image_array, 0, 255)
 
     def contrast(self, image_array):
+        """Change the contrasts of the images."""
         gray_scale = (self._gray_scale(image_array).mean() *
                       np.ones_like(image_array))
         alpha = 2 * np.random.random() * self.contrast_var
@@ -274,6 +308,7 @@ class FaceDataset(Dataset):
         return np.clip(image_array, 0, 255)
 
     def lighting(self, image_array):
+        """Change the lighting of the images."""
         covariance_matrix = np.cov(image_array.reshape(-1, 3) /
                                    255.0, rowvar=False)
         eigen_values, eigen_vectors = np.linalg.eigh(covariance_matrix)
@@ -283,6 +318,7 @@ class FaceDataset(Dataset):
         return np.clip(image_array, 0, 255)
 
     def horizontal_flip(self, image_array, box_corners=None):
+        """Flip the images horizontally."""
         if np.random.random() < self.horizontal_flip_probability:
             image_array = image_array[:, ::-1]
             if box_corners is not None:
@@ -290,6 +326,7 @@ class FaceDataset(Dataset):
         return image_array, box_corners
 
     def vertical_flip(self, image_array, box_corners=None):
+        """Flip the images vertically."""
         if np.random.random() < self.vertical_flip_probability:
             image_array = image_array[::-1]
             if box_corners is not None:
@@ -314,10 +351,22 @@ class FaceDataset(Dataset):
         return image_array, box_corners
 
     def preprocess_images(self, image_array):
+        """Normalize the input images.
+        Args:
+            image_array: The input images with values range from 0 to 255.
+        Returns:
+            The normalized input.
+        """
         return preprocess_input(image_array)
 
 
 def load_imdb(data_path):
+    """Load IMDB data set.
+    Args:
+        data_path: The file path of the data.
+    Returns:
+        data: A list of tuples, e.g. [(abc.jpg, 0), ...].
+    """
     face_score_threshold = 3
     dataset = loadmat(data_path)
     image_names_array = dataset['imdb']['full_path'][0, 0][0]
@@ -340,6 +389,15 @@ def load_imdb(data_path):
 
 
 def split_imdb_data(data, validation_split=.2, do_shuffle=False):
+    """Split the data into training and validation sets.
+    Args:
+        data: The data set to be split, e.g. [(abc.jpg, 0), ...].
+        validation_split: The proportion of the validation set.
+        do_shuffle: If `True`, shuffle the data before splitting. Otherwise, sort the dataset by the image names.
+    Returns:
+        train_set: A subset of the data.
+        val_set: A subset of the data.
+    """
     if do_shuffle:
         shuffle(data)
     else:
@@ -353,6 +411,13 @@ def split_imdb_data(data, validation_split=.2, do_shuffle=False):
 
 
 def preprocess_input(x, v2=True):
+    """Normalize the input images.
+    Args:
+        x: The input images with values range from 0 to 255.
+        v2: If `True` normalize the input to be one with values range from -1 to 1.
+    Returns:
+        x: The normalized input.
+    """
     x = x.astype('float32')
     x = x / 255.0
     if v2:

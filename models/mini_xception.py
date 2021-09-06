@@ -12,18 +12,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+Description: An implementation of MiniXception proposed in the paper `Real-time Convolutional Neural Networks for Emotion and Gender Classification` (https://arxiv.org/pdf/1710.07557v1.pdf).
+"""
 import paddle
 from paddle import nn
 
 
 class DepthWiseSepConv(nn.Layer):
+    """Depth wise separable convolution layer."""
     def __init__(self, in_channels, out_channels):
+        """
+        Args:
+            in_channels: The number of channels of the input of the layer.
+            out_channels: The number of channels of the output of the layer.
+        """
         super(DepthWiseSepConv, self).__init__()
         self.depth_wise = nn.Conv2D(in_channels, in_channels, kernel_size=3, padding='same', groups=in_channels,
                                     bias_attr=False)
         self.point_wise = nn.Conv2D(in_channels, out_channels, kernel_size=1, bias_attr=False)
 
     def forward(self, x):
+        """Forward.
+        Args:
+            x: The input data (images), A tensor with shape (N, C, H, W), C: n_channels.
+        Return:
+            out: The output of the model, A tensor with shape (N, C', H', W').
+        """
         out = self.depth_wise(x)
         out = self.point_wise(out)
         return out
@@ -31,6 +46,11 @@ class DepthWiseSepConv(nn.Layer):
 
 class ResBlock(nn.Layer):
     def __init__(self, in_channels, out_channels):
+        """
+        Args:
+            in_channels: The number of channels of the input of the layer.
+            out_channels: The number of channels of the output of the layer.
+        """
         super(ResBlock, self).__init__()
         self.max_pool = nn.MaxPool2D(3, 2, padding=1)
 
@@ -51,7 +71,11 @@ class ResBlock(nn.Layer):
         )
 
     def forward(self, x):
-        """...
+        """Forward.
+        Args:
+            x: The input data (images), A tensor with shape (N, C, H, W), C: n_channels.
+        Return:
+            out: The output of the model, A tensor with shape (N, C', H', W').
         """
         path1 = self.sep_conv1(x)
         path1 = self.sep_conv2(path1)
@@ -62,7 +86,13 @@ class ResBlock(nn.Layer):
 
 
 class MiniXception(nn.Layer):
+    """The MiniXception structure."""
     def __init__(self, n_classes=2, in_channels=1):
+        """
+        Args:
+            n_classes: The number of classes.
+            in_channels: The number of channels of the input image of the model.
+        """
         super(MiniXception, self).__init__()
         self.n_classes = n_classes
         self.in_channels = in_channels
@@ -91,6 +121,12 @@ class MiniXception(nn.Layer):
         self.global_avg_pool = nn.AdaptiveAvgPool2D(output_size=(1, 1))
 
     def forward(self, x):
+        """Forward.
+        Args:
+            x: The input data (images), A tensor with shape (N, C, H, W), C: n_channels.
+        Returns:
+            out: The output of the model, A tensor with shape (N, n_classes).
+        """
         out = self.conv1(x)
 
         out = self.conv2(out)

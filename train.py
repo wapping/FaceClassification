@@ -12,7 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""
+Description: Train the face classification models ('MiniXception' or 'SimpleCNN').
+"""
 import os
 import logging
 import numpy as np
@@ -33,7 +35,7 @@ logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=lo
 
 
 def train():
-    # Loading the dataset
+    # Load the dataset
     logging.info(f"Loading the dataset ...")
     data = load_imdb(os.path.join(data_args.imdb_dir, 'imdb.mat'))
     train_set, val_set = split_imdb_data(data, args.validation_split)
@@ -57,7 +59,7 @@ def train():
     # For multi-GPUs training
     dist.init_parallel_env()
 
-    # Building model, optimizer and loss function
+    # Build the model, optimizer and loss function
     if args.model_name == "MiniXception":
         model = MiniXception(args.n_classes, args.in_channels)
     else:
@@ -82,7 +84,7 @@ def train():
     train_logger = LogWriter(logdir=os.path.join(args.logdir, 'train'))
     val_logger = LogWriter(logdir=os.path.join(args.logdir, 'val'))
 
-    # Starting training
+    # Start training
     saved_params = []
     max_val_acc = 0.95
     for epoch in range(epoch, args['epochs'] + 1):
@@ -105,8 +107,6 @@ def train():
                 optimizer.step()
                 optimizer.clear_grad()
                 t.set_postfix(train_loss=loss.item(), train_acc=acc.item())
-            # if step % 100 == 0:
-            #     logging.info(f"Step {step}, loss {loss.item()}, acc {acc.item()}")
 
         loss, acc = sum_loss / n_samples, sum_acc / n_samples
         train_logger.add_scalar('loss', loss, epoch)
@@ -132,31 +132,39 @@ def train():
         logging.info(f"Epoch {epoch}, val loss {loss}, val acc {acc}")
         scheduler.step(loss, epoch)
 
+        # Save the model state dict
         if acc > max_val_acc or epoch >= args.epochs:
             logging.info(f"Epoch {epoch}, Output model with val acc {acc} to {args.model_dir}")
             model_path = os.path.join(args.model_dir, f"{args.model_name}-{epoch}-{acc}.params")
             opt_path = os.path.join(args.model_dir, f"{args.model_name}-{epoch}-{acc}.opt")
             paddle.save(model.state_dict(), model_path)
             paddle.save(optimizer.state_dict(), opt_path)
-            if args.just_keep_the_best:
+            if args.just_keep_the_best:     # Just keep the best model, remove the others
                 for p in saved_params:
                     os.remove(p)
             saved_params = [model_path, opt_path]
             max_val_acc = acc
-            if acc >= 0.96:
+            if acc >= 0.96:     # Stop training when the acc reach 0.96
                 logging.info("Finished training.")
                 break
     logging.info("Finished training.")
 
 
 def restore_params(model, model_path):
+    """Restore parameters of the model.
+    Args:
+        model: paddle.nn.Layer, the model to be restored.
+        model_path: The file path of the parameters.
+    """
     logging.info(f"Restoring parameters from {model_path}")
     model_state_dict = paddle.load(model_path)
     model.set_state_dict(model_state_dict)
     return model
 
 
-def set_seed(seed):
+def set_seed(seed: int):
+    """Set the random seed.
+    """
     random.seed(seed)
     np.random.seed(seed)
     paddle.seed(seed)
@@ -168,10 +176,10 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', '-m', type=str, choices=['MiniXception', 'SimpleCNN'],
                         help='Choose a model to train.')
 
-    args = parse_args(parser)
+    args = parse_args(parser)   # parse arguments
 
-    data_args = args.dataset
+    data_args = args.dataset    # arguments of the dataset
 
-    set_seed(args.seed)
+    set_seed(args.seed)     # set the random seed
 
-    train()
+    train()     # begin training

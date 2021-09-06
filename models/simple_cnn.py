@@ -12,13 +12,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""
+Description: An implementation of SimpleCNN proposed in the paper `Real-time Convolutional Neural Networks for Emotion and Gender Classification` (https://arxiv.org/pdf/1710.07557v1.pdf).
+"""
 import paddle
 from paddle import nn
 
 
 class SimpleCNN(nn.Layer):
+    """The SimpleCNN structure."""
     def __init__(self, n_classes=2, in_channels=1):
+        """
+        Args:
+            n_classes: The number of classes.
+            in_channels: The number of channels of the input image of the model.
+        """
         super(SimpleCNN, self).__init__()
         self.n_classes = n_classes
         self.in_channels = in_channels
@@ -86,6 +94,12 @@ class SimpleCNN(nn.Layer):
         )
 
     def forward(self, x):
+        """Forward.
+        Args:
+            x: The input data (images), A tensor with shape (N, C, H, W), C: n_channels.
+        Return:
+            out: The output of the model, A tensor with shape (N, n_classes).
+        """
         out = self.conv1(x)
 
         out = self.conv2(out)

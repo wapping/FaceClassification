@@ -12,7 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""
+Description: Evaluate the face classification models ('MiniXception' or 'SimpleCNN').
+"""
 
 import os
 import logging
@@ -31,6 +33,7 @@ logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=lo
 
 
 def main():
+    # Load the validation set
     logging.info("Loading dataset ...")
     data = load_imdb(os.path.join(data_args.imdb_dir, 'imdb.mat'))
     _, val_set = split_imdb_data(data, args.validation_split)
@@ -38,23 +41,26 @@ def main():
                           img_size=data_args.img_size)
     logging.info(f"The number of validation samples is {val_set.__len__()}.")
 
+    # Create a data loader
     val_loader = DataLoader(val_set, batch_size=args.batch_size, num_workers=4)
 
+    # Initialize the model ('MiniXception' or 'SimpleCNN')
     if args.model_name == "MiniXception":
         model = MiniXception(n_classes=args.n_classes, in_channels=args.in_channels)
     else:
         model = SimpleCNN(n_classes=args.n_classes, in_channels=args.in_channels)
 
+    # Load the model state dict
     model_state_dict = paddle.load(args.model_state_dict)
     model.set_state_dict(model_state_dict)
 
+    # The loss function
     loss_fn = paddle.nn.CrossEntropyLoss()
 
     n_samples, sum_acc, sum_loss = 0, 0., 0.
     model.eval()
     for batch in tqdm(val_loader()):
         inputs, labels = batch[0], batch[1]
-
         pred = model(inputs)
 
         loss = loss_fn(pred, labels)
@@ -69,7 +75,7 @@ def main():
 
     loss, acc = sum_loss / n_samples, sum_acc / n_samples
 
-    logging.info(f"Simples: {n_samples}, Val loss: {loss}, Val accuracy: {acc}")
+    logging.info(f"Samples: {n_samples}, Val loss: {loss}, Val accuracy: {acc}")
 
 
 if __name__ == '__main__':
