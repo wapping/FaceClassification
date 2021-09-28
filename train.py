@@ -87,7 +87,7 @@ def train():
     # Start training
     saved_params = []
     max_val_acc = 0.95
-    for epoch in range(epoch, args['epochs'] + 1):
+    for epoch in range(epoch, args.epochs + 1):
         logging.info("=" * 50 + f"Epoch {epoch}" + "=" * 50)
 
         # Training
