@@ -1,11 +1,23 @@
-# 简介
-通过PaddlePaddle框架复现了论文 [`Real-time Convolutional Neural Networks for Emotion and Gender Classification`](https://arxiv.org/pdf/1710.07557v1.pdf) 中提出的两个模型，分别是`SimpleCNN`和`MiniXception`。利用 `imdb_crop`数据集训练模型，进行人脸性别分类，准确率均达到96%。
-| 模型 | 准确率 | 输入尺寸 |
+English | [简体中文](./README_cn.md) 
+
+[TOC]
+# 一、Introduction
+An implementation of the face (emotion and gender) classification models (`MiniXception`。`SimpleCNN`) proposed in paper [`Real-time Convolutional Neural Networks for Emotion and Gender Classification`](https://arxiv.org/pdf/1710.07557v1.pdf)  with PaddlePaddle. `SimpleCNN` is a standard fully-convolutional neural network composed of 9 convolution layers, ReLUs, Batch Normalization and Global Average Pooling.  `MiniXception` replaces the convolution layers with depth-wise separable convolutions and residual modules. 
+
+# 二、Accuracy
+
+We trained the models with `imdb_crop` dataset in gender classification task and each model obtains an accuracy of 96%.
+
+| Model | Accuracy | Input shape |
 |  :---  | ----  | ----  |
 | SimpleCNN | 96.00% | (48, 48, 3) |
 | MiniXception | 96.01% | (64, 64, 1) |
 
-# Requirements
+# 三、Dataset
+
+We trained and tested models on dataset [imdb_crop](https://pan.baidu.com/s/1xdFxhxcnO_5WyQh7URWMQA) (the password is `mu2h`).  The dataset can be also download from [here](https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki/). First, download and uncompress the dataset. Then, edit configuration files `config/simple_conf.yaml` and `config/min_conf.yaml` of models `SimpleCNN` and `MiniXception`. Set `imdb_dir` to be the path to the dataset. `imdb_dir` s should be the same in training and test stages. You don't need to split the dataset into training and test set, because the python scripts will do that. The dataset will be split in the manner of that proposed in the [paper](https://github.com/oarriaga/face_classification). That is, sorts the images by file names and considers the front 80% as training set and the rear 20% as test set. 
+
+# 四、Environment
 
 ```
 scipy==1.2.1
@@ -17,68 +29,81 @@ visualdl~=2.2.0
 tqdm~=4.62.0
 ```
 
-# 数据准备
+# 五、Quick Start
 
-我们在数据集[imdb_crop](https://pan.baidu.com/s/1xdFxhxcnO_5WyQh7URWMQA) (密码 `mu2h`)上训练模型，数据集也可以在[这里](https://data.vision.ee.ethz.ch/cvl/rrothe/imdb-wiki/)下载。下载和解压数据后，不用对数据再做别的处理了，编辑配置文件`conf.yaml`和`conf2.yaml`，两者分别是`SimpleCNN`和`MiniXception`的配置文件，把 `imdb_dir`设置成数据集所在的目录。不用划分训练集和测试集，程序会自动划分，即使你不训练只测试。我们采取的数据集划分方式和论文[作者的](https://github.com/oarriaga/face_classification)一样，先根据文件名对图片进行排序，前80%为训练集，后20%为测试集。
-
-# 训练
-
-在配置文件`conf.yaml`和`conf2.yaml`里进行相关配置，`mode`设置成`train`，其它选项根据个人情况配置。
-
-执行脚本
+## Step1: Clone
 
 ```shell
-python train_gender_classfifier.py path_to_conf
-```
-比如
-```shell
-python train_gender_classfifier.py ./simple_conf.yaml
+# clone this repo
+git clone https://github.com/wapping/FaceClassification.git
+cd FaceClassification
 ```
 
-`path_to_conf` 是可选的，默认是 `./conf.yaml`，即训练`SimpleCNN`。
+## Step2: Train
 
-# 测试
-
-在配置文件`conf.yaml`和`conf2.yaml`里进行相关配置，`mode`设置成`val`，另外要配置`model_state_dict`和`imdb_dir`。训练和测试的`imdb_dir`是一样的，都是数据集解压后所在的目录，不用对数据进行任何修改。训练和测试的`imdb_dir`虽然一样，但是训练和测试取的是数据集的不同部分，在上文的数据准备中有提到数据集划分的方式。
-
-执行脚本
+Edit the configuration file for your own and run the command like
 
 ```shell
-python train_gender_classfifier.py path_to_conf
+python train.py path_to_conf
+```
+For example
+```shell
+python train.py ./config/simple_conf.yaml
 ```
 
-等结果就行了。
 
-# 指标可视化
+## Step3: Test
 
-你可以通过 `visuadl` 可视化训练过程中指标（比如损失、准确率等）的变化。可以在配置文件里设置日志的输出目录`log_dir`，在训练的过程中，每个epoch的准确率、损失、学习率的信息会写到日志中，分`train`和`val`两个文件夹。
+Edit the configuration file for your own and run the command like
 
-当要查看指标时，执行以下命令
-
-```
-visualdl --logdir your_logdir --host 127.0.0.1
+```shell
+python eval.py path_to_conf
 ```
 
-`your_logdir`是你设置的日志目录。
+Just wait for the results.
 
-然后在浏览器中访问
+# 六、Code Structure and Explanation
+## 6.1 Code Structure
 
-http://127.0.0.1:8040/
+```
+|____config
+| |____conf.yaml
+| |____confg.py
+| |____simple_conf.yaml
+| |____mini_conf.yaml
+|____data
+| |____dataset.py
+|____models
+| |____simple_cnn.py
+| |____mini_xception.py
+|____train.py
+|____eval.py
+```
 
-下面展示我们的模型的指标曲线图。
 
-## SimpleCNN
 
-![avatar](images/simple_loss.png)
+## 6.2 Parameter Explanation
 
-![avatar](images/simple_acc.png)
+- train.py
 
-## MiniXception
+  `--conf_path`: optional, the path to the configuration file, `config/conf.yaml` by default.
 
-![avatar](images/mini_loss.png)
+  `--model_name`: optional, the model name. If given, it will replace `model name` in the configuration file.
 
-![avatar](images/mini_acc.png)
+- eval.py
+`--conf_path`: optional, the path to the configuration file, `config/conf.yaml` by default.
 
+  `--model_name`: optional, the model name. If given, it will replace `model name` in the configuration file.
+  `--model_state_dict`: optional, the path to the model. If given, it will replace `model_state_dict` in the configuration file.
+
+# 七、Model Infomation
+| Field | Content |
+|  :---  | ----  |
+| Author | Huaping Li、Xiaoqian Song |
+| Date | 2021.09 |
+| Framework version | paddlepaddle 2.1.2 |
+| Application scenarios | Face classification |
+| Supported hardware | CPU、GPU |
 
 
 

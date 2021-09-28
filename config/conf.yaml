@@ -23,7 +23,7 @@ dataset:
   do_rand_crop: True
   translation_factor: .2
   vertical_flip_probability: 0.
-  read_img_at_once: True  # Set to `True` if the memory of your device allows. It will speed up the training.
+  read_img_at_once: False  # Set to `True` if the memory of your device allows. It will speed up the training.
 
 num_workers: 4  # num_workers of data loader
 
