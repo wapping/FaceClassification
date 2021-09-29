@@ -44,11 +44,11 @@ cd FaceClassification
 Edit the configuration file for your own and run the command like
 
 ```shell
-python train.py path_to_conf
+python train.py -c path_to_conf
 ```
 For example
 ```shell
-python train.py ./config/simple_conf.yaml
+python train.py -c ./config/simple_conf.yaml
 ```
 
 
@@ -57,7 +57,7 @@ python train.py ./config/simple_conf.yaml
 Edit the configuration file for your own and run the command like
 
 ```shell
-python eval.py path_to_conf
+python eval.py -c path_to_conf
 ```
 
 Just wait for the results.

@@ -44,11 +44,11 @@ cd FaceClassification
 根据实际情况配置文件，然后执行命令
 
 ```shell
-python train.py path_to_conf
+python train.py -c path_to_conf
 ```
 比如
 ```shell
-python train.py ./config/simple_conf.yaml
+python train.py -c ./config/simple_conf.yaml
 ```
 
 
@@ -57,7 +57,7 @@ python train.py ./config/simple_conf.yaml
 根据实际情况配置文件，然后执行命令
 
 ```shell
-python eval.py path_to_conf
+python eval.py -c path_to_conf
 ```
 
 等结果就行了。
